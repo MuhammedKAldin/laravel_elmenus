@@ -9,6 +9,10 @@ use App\Http\Controllers\VendorController;
 use App\Http\Controllers\MobileWalletController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Vendor\CategoryController as VendorCategoryController;
+use App\Http\Controllers\Vendor\PostController as VendorPostController;
+use App\Http\Controllers\PostController;
+use App\Http\Controllers\Vendor\ProductCategoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,7 +34,8 @@ Auth::routes();
 // Base Laravel/UI Home
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 
-// Home Page
+// -------------------------------------------------------------
+// Home Page (All Users)
 Route::get('/', [PortalController::class, 'index'])->name('index');
 
 // Displaying All Restraunts Found (All Users) 
@@ -43,32 +48,57 @@ Route::get('/search', [PortalController::class, 'search'])->name('search');
 Route::get('/cart', [CartController::class, 'cart'])->name('cart');
 
 // Displaying Menu of a Selected Restarunt with Id (All Users)
-Route::get('/menus/{id}', [PortalController::class, 'openMenu'])->name('openMenu');
+Route::get('/menus/{slug}', [PortalController::class, 'openMenu'])->name('openMenu');
 
-// Restraunt General Data (Vendor)
-Route::get('/vendor/general', [VendorController::class, 'vendorProfile'])->name('vendorProfile');
+// -------------------------------------------------------------
+// Tenant Routes (Vendors Profile Management)
+Route::middleware(['auth', 'storeOwner'])->prefix('vendor')->name('vendor.')->group(function () {
+    // Restraunt General Data (Vendor)
+    Route::get('/general', [VendorController::class, 'vendorProfile'])->name('profile');
+    Route::put('/general', [VendorController::class, 'updateProfile'])->name('profile.update');
 
-// Restraunt Meals Data (Vendor)
-Route::get('/vendor/meals', [VendorController::class, 'vendorMeals'])->name('vendorMeals');
+    // Restraunt Meals Data (Vendor)
+    Route::get('/meals', [VendorController::class, 'meals'])->name('meals');
 
-// Search Meals on Menu (Vendor)
-Route::get('/vendor/search', [VendorController::class, 'vendorSearchMeals'])->name('vendorSearchMeals');
+    // Search Meals on Menu (Vendor)
+    Route::get('/search', [VendorController::class, 'vendorSearchMeals'])->name('search');
 
-// Create New Meal (Vendor)
-Route::get('/vendor/create', [VendorController::class, 'vendorCreate'])->name('vendorCreate');
+    // Create New Meal (Vendor)
+    Route::get('/create', [VendorController::class, 'vendorCreate'])->name('create');
 
-// Process New Meal Created (Vendor)
-Route::post('/vendor/create/process', [VendorController::class, 'vendorCreateProcess'])->name('vendorCreateProcess');
+    // Process New Meal Created (Vendor)
+    Route::post('/create/process', [VendorController::class, 'vendorCreateProcess'])->name('create.process');
 
-// Display Meal Id Data (Vendor)
-Route::get('/vendor/meals/{id}', [VendorController::class, 'vendorShowMeal'])->name('vendorShowMeal');
+    // Display Meal Id Data (Vendor)
+    Route::get('/meals/{id}', [VendorController::class, 'vendorShowMeal'])->name('meals.show');
 
-// Update Data of Meal by Id (Vendor)
-Route::put('/vendor/meals/{id}/process', [VendorController::class, 'editMealProcess'])->name('editMealProcess');
+    // Update Data of Meal by Id (Vendor)
+    Route::put('/meals/{id}/process', [VendorController::class, 'editMealProcess'])->name('meals.update');
 
-// Remove Meal Data (Vendor)
-Route::get('/vendor/meals/{id}/remove', [VendorController::class, 'removeMeal'])->name('removeMeal');
+    // Remove Meal Data (Vendor)
+    Route::get('/meals/{id}/remove', [VendorController::class, 'removeMeal'])->name('meals.remove');
 
+    // Categories Routes
+    Route::get('/categories/create', [VendorCategoryController::class, 'create'])->name('categories.create');
+    Route::post('/categories/store', [VendorCategoryController::class, 'store'])->name('categories.store');
+    Route::get('/categories', [VendorCategoryController::class, 'index'])->name('categories.index');
+    Route::get('/categories/{category}/edit', [VendorCategoryController::class, 'edit'])->name('categories.edit');
+    Route::put('/categories/{category}', [VendorCategoryController::class, 'update'])->name('categories.update');
+    Route::delete('/categories/{category}', [VendorCategoryController::class, 'destroy'])->name('categories.destroy');
+
+    // Posts Routes
+    Route::get('/posts/create', [VendorPostController::class, 'create'])->name('posts.create');
+    Route::post('/posts/store', [VendorPostController::class, 'store'])->name('posts.store');
+    Route::get('/posts', [VendorPostController::class, 'index'])->name('posts.index');
+    Route::get('/posts/{post}/edit', [VendorPostController::class, 'edit'])->name('posts.edit');
+    Route::put('/posts/{post}', [VendorPostController::class, 'update'])->name('posts.update');
+    Route::delete('/posts/{post}', [VendorPostController::class, 'destroy'])->name('posts.destroy');
+
+    Route::resource('product-categories', ProductCategoryController::class);
+});
+
+// -------------------------------------------------------------
+// Paymob Payment Routes (All Users) //
 // Paymob Payment Sending Data (Performing Credit Card Payment)
 Route::post('/credit', [PaymobController::class, 'credit'])->name('checkout');
 

@@ -28,8 +28,8 @@ class Product extends Model
         'is_featured' => 'boolean'
     ];
 
-    public function category(): BelongsTo
+    public function productCategory()
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsTo(ProductCategory::class);
     }
 } 

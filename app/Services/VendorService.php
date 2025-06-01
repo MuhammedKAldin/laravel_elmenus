@@ -2,68 +2,76 @@
 
 namespace App\Services;
 
+use App\Models\Store;
 use App\Models\Vendor;
 use App\Models\MenuItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class VendorService
 {
-    public function getVendorProfile()
+    public function getVendorProfile(Store $store)
     {
-        $id = Auth::user()->id;
-        return Vendor::where('verified_user_id', $id)->first();
+        return $store;
     }
 
-    public function getVendorMeals()
+    public function getVendorMeals(Store $store)
     {
-        $id = Auth::user()->id;
-        return MenuItem::where('vendor_id', $id)->get();
+        return $store->products;
     }
 
-    public function createMeal(Request $request)
+    public function createMeal(Request $request, Store $store)
     {
         $request->validate([
-            'meal_name' => 'required',
-            'meal_price' => 'required',
-            'meal_category' => 'required|in:grill,fried chicken,pizza,burger',
-            'meal_desc' => 'required',
-            'meal_image' => 'required|image',
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'price' => 'required|numeric|min:0',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'category_id' => 'required|exists:categories,id'
         ]);
+
         $data = $request->all();
-        $data['vendor_id'] = Auth::user()->id;
-        $data['meal_availability'] = "available";
-        if ($request->hasFile('meal_image')) {
-            $image = $request->file('meal_image');
-            $destinationPath = 'storage/meals/';
-            $imageName = date('YmdHis').".".$image->getClientOriginalExtension();
-            $image->move($destinationPath, $imageName);
-            $data['meal_image'] = $imageName;
+        
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $imageName = time() . '.' . $image->getClientOriginalExtension();
+            $image->storeAs('public/products', $imageName);
+            $data['image'] = 'products/' . $imageName;
         }
-        MenuItem::create($data);
+
+        $data['store_id'] = $store->id;
+        
+        return $store->products()->create($data);
     }
 
-    public function getMealById($id)
+    public function getMealById($id, Store $store)
     {
-        return MenuItem::where('id', $id)->first();
+        return $store->products()->findOrFail($id);
     }
 
-    public function editMeal(Request $request, $id)
+    public function editMeal($request, $id, Store $store)
     {
-        $input = $request->all();
-        $item = MenuItem::findOrFail($id);
-        $item->update($input);
+        $product = $store->products()->findOrFail($id);
+        $product->update([
+            'name' => $request->name,
+            'description' => $request->description,
+            'price' => $request->price,
+            'image' => $request->image,
+            'category_id' => $request->category_id
+        ]);
     }
 
-    public function removeMeal($id)
+    public function removeMeal($id, Store $store)
     {
-        $item = MenuItem::findOrFail($id);
-        $item->delete();
+        $store->products()->findOrFail($id)->delete();
     }
 
-    public function searchMeals(Request $request)
+    public function searchMeals($request, Store $store)
     {
-        $searchTerm = $request->input('query');
-        return MenuItem::where('meal_name', 'LIKE', '%' . $searchTerm . '%')->get();
+        return $store->products()
+            ->where('name', 'like', '%' . $request->search . '%')
+            ->orWhere('description', 'like', '%' . $request->search . '%')
+            ->get();
     }
 } 

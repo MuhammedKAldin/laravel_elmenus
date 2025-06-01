@@ -14,8 +14,12 @@ trait BelongToStore
     protected static function booted()
     {
         static::addGlobalScope('store', function ($query) {
-            $store = app()->make('store.active');
-            $query->where('store_id', $store->id);
+            if (app()->bound('store.active')) {
+                $store = app()->get('store.active');
+                if ($store) {
+                    $query->where('store_id', $store->id);
+                }
+            }
         });
     }
 } 

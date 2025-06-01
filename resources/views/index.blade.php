@@ -19,33 +19,21 @@
     <!-- features_room_startt -->
     <div class="Burger_President_area">
             <div class="Burger_President_here">
+                @foreach($featuredProducts as $product)
                 <div class="single_Burger_President">
                     <div class="room_thumb">
-                        <img src="{{asset('img/burgers/1.png')}}" alt="">
+                        <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}">
                         <div class="room_heading d-flex justify-content-between align-items-center">
                             <div class="room_heading_inner">
-                                <span>$20</span>
-                                <h3>Old School Burger</h3>
-                                <p>Great way to make your business appear trust <br> and relevant.</p>
-                                <a href="#" class="boxed-btn3">Order Now</a>
-                            </div>
-                            
-                        </div>
-                    </div>
-                </div>
-                <div class="single_Burger_President">
-                    <div class="room_thumb">
-                        <img src="{{asset('img/burgers/2.png')}}" alt="">
-                        <div class="room_heading d-flex justify-content-between align-items-center">
-                            <div class="room_heading_inner">
-                                <span>$20</span>
-                                <h3>Cheese Madness Burger</h3>
-                                <p>Great way to make your business appear trust <br> and relevant.</p>
-                                <a href="#" class="boxed-btn3">Order Now</a>
+                                <span>{{ number_format($product->price, 2) }} EGP</span>
+                                <h3>{{ $product->name }}</h3>
+                                <p>{{ $product->description }}</p>
+                                <a href="{{ route('openMenu', $product->store->slug) }}" class="boxed-btn3">View Restaurant</a>
                             </div>
                         </div>
                     </div>
                 </div>
+                @endforeach
         </div>
     </div>
     <!-- features_room_end -->

@@ -15,9 +15,9 @@
                 <div class="row">
                     <div class="col-xl-12 blog_right_sidebar">
                             <ul class="section_title mb-60 post_category_widget text-center" style="display: ruby-text;">
-                                <li> <a href="{{route('vendorProfile')}}" class='widget_title' >General</a> </li>
+                                <li> <a href="{{route('vendor.profile')}}" class='widget_title' >General</a> </li>
                                 <li> / </li>
-                                <a href="{{route('vendorMeals')}}" class='widget_title  section-active' >Meals</a> </li>
+                                <a href="{{route('vendor.meals')}}" class='widget_title  section-active' >Meals</a> </li>
                             </ul>
                     </div>
                 </div>
@@ -29,114 +29,113 @@
 
                 <div class="col-lg-4">
                     <div class='text-center'>
-                        <a class="boxed-btn5" href="{{route('vendorCreate')}}" style="padding: 16px 100px;"> 
+                        <a class="boxed-btn5" href="{{route('vendor.create')}}" style="padding: 16px 100px; margin-bottom: 15px;"> 
                             Create New Meal
+                        </a>
+                        <br>
+                        <a class="boxed-btn5" href="{{route('vendor.categories.create')}}" style="padding: 16px 100px; margin-bottom: 15px;"> 
+                            Create Category
+                        </a>
+                        <br>
+                        <a class="boxed-btn5" href="{{route('vendor.posts.create')}}" style="padding: 16px 100px;"> 
+                            Create Post
                         </a>
                     </div>
 
-                    <div class="blog_right_sidebar" style=" padding-top: 10px;">
-                        <aside class="single_sidebar_widget popular_post_widget" >
-                            <h3 class="widget_title">Recent Posts</h3>
-                            <div class="media post_item">
-                                <img src="img/post/post_1.png" alt="post">
-                                <div class="media-body">
-                                    <a href="single-blog.html">
-                                        <h3>From life was you fish...</h3>
-                                    </a>
-                                    <p>January 12, 2019</p>
-                                </div>
-                            </div>
-                            <div class="media post_item">
-                                <img src="img/post/post_2.png" alt="post">
-                                <div class="media-body">
-                                    <a href="single-blog.html">
-                                        <h3>The Amazing Hubble</h3>
-                                    </a>
-                                    <p>02 Hours ago</p>
-                                </div>
-                            </div>
-                            <div class="media post_item">
-                                <img src="img/post/post_3.png" alt="post">
-                                <div class="media-body">
-                                    <a href="single-blog.html">
-                                        <h3>Astronomy Or Astrology</h3>
-                                    </a>
-                                    <p>03 Hours ago</p>
-                                </div>
-                            </div>
-                            <div class="media post_item">
-                                <img src="img/post/post_4.png" alt="post">
-                                <div class="media-body">
-                                    <a href="single-blog.html">
-                                        <h3>Asteroids telescope</h3>
-                                    </a>
-                                    <p>01 Hours ago</p>
-                                </div>
-                            </div>
+                    <div class="blog_right_sidebar" style=" padding-top: 30px;">
+                        <aside class="single_sidebar_widget post_category_widget">
+                            <h3 class="widget_title">Categories</h3>
+                            <ul class="list">
+                                @foreach($categories as $category)
+                                    <li>
+                                        <a href="#{{ $category->id }}" class="category-filter" data-category="{{ $category->id }}">
+                                            {{ $category->name }}
+                                            <span class="badge badge-primary">{{ $category->products_count }}</span>
+                                        </a>
+                                    </li>
+                                @endforeach
+                            </ul>
                         </aside>
-
                     </div>
                 </div>
 
                 <div class="col-lg-8 mb-5 mb-lg-0">
 
                     <aside class="single_sidebar_widget search_widget">
-
-                        <div class="form-group">
-                            <div class="input-group mb-3">
-                                <input id="searchInput" type="text" class="form-control" placeholder='Search Keyword'>
-                                <div class="input-group-append">
-                                    <button class="btn" type="button"><i class="ti-search"></i></button>
+                        <form action="{{ route('vendor.meals') }}" method="GET" id="searchForm">
+                            <div class="form-group">
+                                <div class="input-group mb-3">
+                                    <input id="searchInput" name="search" type="text" class="form-control" 
+                                           placeholder='Search Meals' value="{{ request('search') }}">
+                                    <div class="input-group-append">
+                                        <button class="btn" type="submit">
+                                            <i class="fa-solid fa-magnifying-glass"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <button id="searchButton" class="button rounded-0 primary-bg text-white w-100 btn_1 boxed-btn"
-                        type="button">Search
-                        </button>
+                            <button type="submit" class="button rounded-0 primary-bg text-white w-100 btn_1 boxed-btn">
+                                Search
+                            </button>
+                        </form>
                     </aside>
 
                     <!--================Blog Area =================-->
                     <div class="best_burgers_area">
                         <div class="container">
                             <div id="searchResults" class="row">
+                                @if(request('search'))
+                                    <div class="col-12 mb-3">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h4>Search Results for "{{ request('search') }}"</h4>
+                                            <a href="{{ route('vendor.meals') }}" class="btn btn-outline-secondary btn-sm">
+                                                <i class="fa-solid fa-times me-1"></i>Clear Search
+                                            </a>
+                                        </div>
+                                    </div>
+                                @endif
                                 @foreach ($items as $item)
-                                    <div class="col-12 text-center">
+                                    <div class="col-12 mb-4">
                                         <div class="single_delicious d-flex align-items-center">
-                                        <div class="thumb">
-                                            <img src="{{asset('storage/meals/'.$item->meal_image)}}" alt="" style="width: 236px; border-radius: 26%;">
-                                        </div>
-                                        <div class="info" style="width: 100%;">
-                                            <div class="container">
-                                                <div class="row">
-                                                    <div class="col-6"> 
-                                                    <h3> {{$item->meal_name}} </h3>
+                                            <div class="thumb">
+                                                <img src="{{ asset('storage/' . $item->image) }}" alt="{{ $item->name }}" 
+                                                     style="width: 236px; height: 236px; object-fit: cover; border-radius: 26%;">
+                                            </div>
+                                            <div class="info" style="width: 100%;">
+                                                <div class="container">
+                                                    <div class="row">
+                                                        <div class="col-6">
+                                                            <h3>{{ $item->name }}</h3>
+                                                            <div class="d-flex align-items-center gap-2">
+                                                                <span class="category-badge">
+                                                                    {{ $item->productCategory->name ?? 'Uncategorized' }}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-6 text-right">
+                                                            <span class="price">Price: {{ number_format($item->price, 2) }} EGP</span>
+                                                        </div>
                                                     </div>
-                                                    <div class="col-6"> 
-                                                        <span>Price : {{$item->meal_price}}  EGP</span>
+                                                </div>
+                                                <div class="container mt-3">
+                                                    <div class="row">
+                                                        <div class="col-6">
+                                                            <p class='description'>{{ $item->description }}</p>
+                                                        </div>
+                                                        <div class="col-6 text-right">
+                                                            <a class="boxed-btn5" href="{{ route('vendor.meals.show', ['id' => $item->id]) }}" 
+                                                               style="padding: 16px 20px;" title="Edit">
+                                                                <i class="fa-solid fa-pen-to-square" aria-hidden="true" style="font-size: 22px;"></i>
+                                                            </a>
+                                                            <a class="boxed-btn5" href="{{ route('vendor.meals.remove', ['id' => $item->id]) }}" 
+                                                               style="padding: 16px 20px;" title="Delete"
+                                                               onclick="return confirm('Are you sure you want to delete this meal?')">
+                                                                <i class="fa-solid fa-trash-can" aria-hidden="true" style="font-size: 22px;"></i>
+                                                            </a>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="container">
-                                                <div class="row">
-                                                    <div class="col-6"> 
-                                                    <p class='description' >  {{$item->meal_desc}}  </p>
-                                                    </div>
-                                                    <div class="col-6"> 
-                                                        <a class="boxed-btn5" href="{{ route('vendorShowMeal', ['id' => $item->id]) }}" style="padding: 16px 20px;">
-                                                            <i class="fa fa-pencil-square-o" aria-hidden="true" 
-                                                            style="font-size: 22px";
-                                                            ></i> 
-                                                        </a>
-
-                                                        <a class="boxed-btn5" href="{{ route('removeMeal', ['id' => $item->id]) }}" style="padding: 16px 20px;">
-                                                            <i class="fa fa-minus-square" aria-hidden="true" 
-                                                            style="font-size: 22px";
-                                                            ></i> 
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
                                         </div>
                                     </div>
                                 @endforeach
@@ -145,24 +144,7 @@
                     </div>
 
                     <nav class="blog-pagination justify-content-center d-flex">
-                        <ul class="pagination">
-                            <li class="page-item">
-                                <a href="#" class="page-link" aria-label="Previous">
-                                    <i class="ti-angle-left"></i>
-                                </a>
-                            </li>
-                            <li class="page-item">
-                                <a href="#" class="page-link">1</a>
-                            </li>
-                            <li class="page-item active">
-                                <a href="#" class="page-link">2</a>
-                            </li>
-                            <li class="page-item">
-                                <a href="#" class="page-link" aria-label="Next">
-                                    <i class="ti-angle-right"></i>
-                                </a>
-                            </li>
-                        </ul>
+                        {{ $items->links() }}
                     </nav>
 
                     </div>
@@ -170,77 +152,85 @@
             </div>
         </div>
 
+        <style>
+            .single_delicious {
+                background: #fff;
+                padding: 20px;
+                border-radius: 10px;
+                box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+                transition: transform 0.3s ease;
+            }
+            .single_delicious:hover {
+                transform: translateY(-5px);
+            }
+            .badge {
+                padding: 5px 10px;
+                border-radius: 15px;
+                font-size: 0.8em;
+            }
+            .badge-info {
+                background-color: #17a2b8;
+                color: white;
+            }
+            .price {
+                font-size: 1.2em;
+                color: #e74c3c;
+                font-weight: bold;
+            }
+            .description {
+                color: #666;
+                margin-bottom: 0;
+            }
+            .category-filter {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 8px 0;
+                color: #333;
+                text-decoration: none;
+                transition: color 0.3s ease;
+            }
+            .category-filter:hover {
+                color: #e74c3c;
+                text-decoration: none;
+            }
+            .category-badge {
+                display: inline-flex;
+                align-items: center;
+                background-color: #f8f9fa;
+                color: #6c757d;
+                padding: 4px 8px;
+                border-radius: 12px;
+                font-size: 0.8rem;
+                font-weight: 500;
+                border: 1px solid #dee2e6;
+                transition: all 0.2s ease;
+                font-size: 12px !important;
+            }
+            .category-badge:hover {
+                background-color: #e9ecef;
+                border-color: #ced4da;
+            }
+            .category-badge i {
+                font-size: 0.7rem;
+                color: #6c757d;
+            }
+        </style>
+
         <script>
-                $('#searchButton').click(function(event) {
-                    event.preventDefault(); // Prevent the default form submission
-
-                    var query = $('#searchInput').val();
-
-                    $.ajax({
-                        url: "{{ route('vendorSearchMeals') }}",
-                        method: 'GET',
-                        data: {
-                            query: query
-                        },
-                        success: function(response) 
-                        {
-                            $('#searchResults').empty(); // Clear previous results
-
-                            if(response.length > 0) {
-                                response.forEach(function(item) 
-                                {
-                                    // Construct the URLs dynamically
-                                    var showMealUrl = "{{ url('vendor/meals') }}/" + item.id;
-                                    var removeMealUrl = "{{ url('vendor/remove') }}/" + item.id;
-
-                                    var resultHtml = `
-                                        <div class="col-12 text-center">
-                                            <div class="single_delicious d-flex align-items-center">
-                                                <div class="thumb">
-                                                    <img src="{{ asset('storage/meals/${item.meal_image}') }}" alt="" style="width: 236px; border-radius: 26%;">
-                                                </div>
-                                                <div class="info" style="width: 100%;">
-                                                    <div class="container">
-                                                        <div class="row">
-                                                            <div class="col-6">
-                                                                <h3>${item.meal_name}</h3>
-                                                            </div>
-                                                            <div class="col-6">
-                                                                <span>Price: ${item.meal_price} EGP</span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="container">
-                                                        <div class="row">
-                                                            <div class="col-6">
-                                                                <p class='description'>${item.meal_desc}</p>
-                                                            </div>
-                                                            <div class="col-6">
-                                                                <a class="boxed-btn5" href="${showMealUrl}" style="padding: 16px 20px;">
-                                                                    <i class="fa fa-pencil-square-o" aria-hidden="true" style="font-size: 22px;"></i>
-                                                                </a>
-                                                                <a class="boxed-btn5" href="${removeMealUrl}" style="padding: 16px 20px;">
-                                                                    <i class="fa fa-minus-square" aria-hidden="true" style="font-size: 22px;"></i>
-                                                                </a>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    `;
-                                    $('#searchResults').append(resultHtml);
-                                });
-                            } else {
-                                $('#searchResults').append('<p>No results found</p>');
-                            }
-                        },
-                        error: function() {
-                            $('#searchResults').append('<p>There was an error processing your request</p>');
-                        }
-                    });
+            $(document).ready(function() {
+                // Remove the old AJAX search functionality since we're using GET requests now
+                
+                // Category filter functionality
+                $('.category-filter').click(function(e) {
+                    e.preventDefault();
+                    var categoryId = $(this).data('category');
+                    
+                    // Add your category filtering logic here
+                    // You can either reload the page with a category parameter
+                    // or use AJAX to filter the meals
                 });
-
+            });
         </script>
     <!--================Blog Area =================-->
 @endsection

@@ -59,48 +59,46 @@
 
                 <div class="col-lg-8 posts-list">
                     <div class="single_sidebar_widget search_widget">
-                           <div class="form-group">
-                              <div class="input-group mb-3">
-                                 <input id="searchInput" type="text" class="form-control" placeholder='Search Keyword'>
-                                 <div class="input-group-append">
-                                    <button class="btn" type="button"><i class="ti-search"></i></button>
+                           <form action="{{ route('search') }}" method="GET">
+                              <div class="form-group">
+                                 <div class="input-group mb-3">
+                                    <input name="query" type="text" class="form-control" placeholder='Search Keyword' value="{{ $searchTerm ?? '' }}">
+                                    <div class="input-group-append">
+                                       <button class="btn" type="submit"><i class="ti-search"></i></button>
+                                    </div>
                                  </div>
                               </div>
-                           </div>
-                           <button id="searchButton" class="button rounded-0 primary-bg text-white w-100 btn_1 boxed-btn"
-                           type="button">Search
-                           </button>
+                           </form>
                     </div>
 
                     </br>
                     
                     <div id="searchResults">
+                     @if($stores->isEmpty())
+                        <div class="alert alert-info">No restaurants found matching your search.</div>
+                     @else
                         @foreach ($stores as $store)
                         <div class="single-post">
-                           <!-- features_room_startt -->
                            <div class="Burger_President_area">
-                              <div class="Burger_President_here">
+                              <div class="Burger_President_here"> 
                                  <div class="single_Burger_President" style="width:100%!important;">
                                        <div class="room_thumb">
-                                          <img src="{{ asset('storage/stores/'.$store->cover_image) }}" alt="">
+                                          <img src="{{ asset('storage/' . $store->cover_image) }}" alt="{{ $store->name }}">
                                           <div class="room_heading d-flex justify-content-between align-items-center">
                                              <div class="room_heading_inner">
-                                                   <span> {{$store->name}} </span>
-                                                   <h3> {{$store->address}} </h3>
-                                                   <p> {{$store->description}} </p>
-                                                   <a href="{{ route('openMenu', $store->id) }}" class="boxed-btn3">Open Menu</a>
+                                                   <span>{{ $store->name }}</span>
+                                                   <p>{{ $store->description }}</p>
+                                                   <a href="{{ route('openMenu', $store->slug) }}" class="boxed-btn3">Open Menu</a>
                                              </div>
-                                             
                                           </div>
                                        </div>
                                  </div>
-
                               </div>
                            </div>
                         </div>
                         </br>
                         @endforeach
-
+                     @endif
                     </div>
                </div>
            </div>
@@ -108,63 +106,24 @@
        <!--================ Blog Area end =================-->
 
        <script>
-         $('#searchButton').click(function(event) 
-         {
-             event.preventDefault(); // Prevent the default form submission
-     
-             var query = $('#searchInput').val();
-            
-             $.ajax({
-                 url: "{{ route('search') }}",
-                 method: 'GET',
-                 data: {
-                     query: query
-                 },
-                 success: function(response) 
-                 {
+         $(document).ready(function() {
+             // Search on button click
+             $('#searchButton').click(function(event) {
+                 event.preventDefault();
+                 var query = $('#searchInput').val().trim();
+                 if (query) {
+                     performSearch(query);
+                 }
+             });
 
-                  $('#searchResults').empty(); // Clear previous results
-
-                  if(response.length > 0) 
-                  {
-                     response.forEach(function(store) 
-                     {
-                        // Construct URLs dynamically if needed
-                        var showMenuUrl = "{{ url('/menus') }}/" + store.id; 
-
-                        // Build HTML using the properties from the response
-                        var resultHtml = `
-                           <div class="single-post">
-                              <div class="Burger_President_area">
-                                    <div class="Burger_President_here">
-                                       <div class="single_Burger_President" style="width:100%!important;">
-                                          <div class="room_thumb">
-                                                <img src="{{ asset('storage/stores/') }}/${store.cover_image}" alt="">
-                                                <div class="room_heading d-flex justify-content-between align-items-center">
-                                                   <div class="room_heading_inner">
-                                                      <span>${store.name}</span>
-                                                      <h3>${store.address}</h3>
-                                                      <p>${store.description}</p>
-                                                      <a href="${showMenuUrl}" class="boxed-btn3">Open Menu</a>
-                                                   </div>
-                                                </div>
-                                          </div>
-                                       </div>
-                                    </div>
-                              </div>
-                           </div>
-                           <br>
-                        `;
-                        $('#searchResults').append(resultHtml);
-                     });
-                  } else {
-                     $('#searchResults').append('<p>No results found</p>');
-                  }
-                     
-                 },
-                 error: function(jqXHR, textStatus, errorThrown) {
-                     console.error("Error:", textStatus, errorThrown);
-                     $('#searchResults').append('<p>There was an error processing your request</p>');
+             // Search on Enter key press
+             $('#searchInput').keypress(function(event) {
+                 if (event.which === 13) {
+                     event.preventDefault();
+                     var query = $(this).val().trim();
+                     if (query) {
+                         performSearch(query);
+                     }
                  }
              });
          });

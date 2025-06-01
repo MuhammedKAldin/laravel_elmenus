@@ -9,21 +9,29 @@ class PortalController extends Controller
 {
     public function index()
     {
-        return view('index');
+        $featuredProducts = \App\Models\Product::where('is_featured', true)
+            ->with(['store', 'productCategory'])
+            ->latest()
+            ->take(6)
+            ->get();
+
+        return view('index', compact('featuredProducts'));
     }
 
     public function menus()
     {
-        // $vendors = Vendor::all();
-        // return view('menus', compact('vendors'));
-
-        $stores = Store::where('status', 'active')->get();
+        $stores = Store::all();
         return view('menus', compact('stores'));
     }
 
-    public function openMenu($id)
+    public function openMenu($slug)
     {
-        $store = Store::with(['categories.products'])->findOrFail($id);
+        $store = Store::where('slug', $slug)
+            ->with(['categories.products', 'posts' => function($query) {
+                $query->latest()->take(5);
+            }])
+            ->firstOrFail();
+
         return view('menu', compact('store'));
     }
 
@@ -31,16 +39,12 @@ class PortalController extends Controller
     {
         $searchTerm = $request->input('query');
     
-        // Search the Store model based on the search term
-        $results = Store::where('status', 'active')
-            ->where(function($query) use ($searchTerm) {
-                $query->where('name', 'LIKE', '%' . $searchTerm . '%')
-                    ->orWhere('description', 'LIKE', '%' . $searchTerm . '%')
-                    ->orWhere('address', 'LIKE', '%' . $searchTerm . '%');
-            })
+        // Search across multiple fields
+        $stores = Store::where('name', 'LIKE', '%' . $searchTerm . '%')
+            ->orWhere('description', 'LIKE', '%' . $searchTerm . '%')
+            ->orWhere('address', 'LIKE', '%' . $searchTerm . '%')
             ->get();
     
-        // Return the search results as JSON for AJAX
-        return response()->json($results);
+        return view('menus', compact('stores', 'searchTerm'));
     }
 }

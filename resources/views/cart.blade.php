@@ -5,14 +5,8 @@
     <!-- video_area_start -->
        <div class="video_area video_bg overlay">
         <div class="video_area_inner text-center">
-            <h3>Burger <br>
-                Bachelor</h3>
-            <span>How we make delicious Burger</span>
-            <div class="video_payer">
-                <a href="https://www.youtube.com/watch?v=vLnPwxZdW4Y" class="video_btn popup-video">
-                    <i class="fa fa-play"></i>
-                </a>
-            </div>
+            <h3>Shopping Cart</h3>
+            <span>Review your order</span>
         </div>
     </div>
     <!-- video_area_end -->
@@ -44,169 +38,307 @@
       </div>
 
       <div class="container">
-          <div id="cartItems" class="loading" class="row">
-              {{-- <div class="col-12 text-center">
-                  <div class="single_delicious d-flex align-items-center">
-                     <div class="thumb">
-                        <img src="img/burger/1.png" alt="">
-                     </div>
-                     <div class="info">
-                        <div class="container">
-                           <div class="row">
-                              <div class="col-6"> 
-                                 <h3>Beefy Burgers</h3>
-                              </div>
-                              <div class="col-6"> 
-                                 <span>Price : 5 EGP</span>
-                              </div>
-                           </div>
-                        </div>
-                        <div class="container">
-                           <div class="row">
-                              <div class="col-6"> 
-                                 <p class='description' >Great way to make your business appear trust and relevant.</p>
-                              </div>
-
-                              <div class="col-6"> 
-                                 <a class="boxed-btn5" href=""> Remove </a>
-                              </div>
-                           </div>
-                        </div>
-                     </div>
-                  </div>
-              </div> --}}
-             
-              <i class="fa fa-circle-o-notch fa-spin" style="font-size:74px"></i>
-
+          <div id="cartItems" class="row">
+              <!-- Cart items will be dynamically inserted here -->
           </div>
 
-          <div class="col-12 blog_right_sidebar">
-            <a href="#" class='widget_title  section-active' style="font-size: 35px;" >SubTotal : <span id="subtotal">0</span> EGP</a> 
+          <div class="cart-summary">
+              <div class="col-12 blog_right_sidebar">
+                  <h3 class="widget_title">SubTotal: <span id="subtotal">0</span> EGP</h3>
+              </div>
+
+              <form action="{{ route('checkout') }}" method="POST" class="checkout-form">
+                  @csrf
+                  <input type="hidden" name="total_amount" id="total_amount" value="0">
+                  <button class="button rounded-0 primary-bg text-white w-100 btn_1 boxed-btn" type="submit">
+                     <i class="fas fa-credit-card me-2"></i> Pay with Credit Card
+                  </button>
+              </form>
+
+              <button id="clearCartBtn" class="button rounded-0 secondary-bg text-white w-100 btn_1 boxed-btn" type="button">
+                  <i class="fas fa-trash-alt me-2"></i> Clear Cart
+              </button>
           </div>
-
-         <form action="{{ route('checkout') }}" method="POST">
-            @csrf
-            <button class="button rounded-0 primary-bg text-white w-100 btn_1 boxed-btn" type="submit">
-               Pay with Credit Card
-            </button>
-         </form>
-
-         {{-- <form action="{{ route('wallet') }}" method="POST">
-         @csrf
-            <button class="button rounded-0 primary-bg text-white w-100 btn_1 boxed-btn" type="submit" style="margin-top: 37px;">
-               Pay with Mobile Wallet
-            </button>
-            <input class="form-control valid" name="phone_number" type="text" placeholder="Mobile wallet number.." >
-         </form> --}}
-
-         <button id="clearCartBtn" class="button rounded-0 primary-bg text-white w-100 btn_1 boxed-btn"
-         type="button" style="margin-top: 37px; ">Clear Cart
-         </button>
-
       </div>
      </div>
      
-   <script>
-      document.addEventListener('DOMContentLoaded', function() 
-      {
-         // Function to get cart from local storage
+   <style>
+      .cart-item {
+          background: white;
+          border-radius: 10px;
+          box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+          margin-bottom: 20px;
+          transition: all 0.3s ease;
+          overflow: hidden;
+      }
+
+      .cart-item:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+      }
+
+      .cart-item-content {
+          padding: 20px;
+      }
+
+      .cart-item-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 15px;
+      }
+
+      .cart-item-title {
+          font-size: 1.2em;
+          font-weight: bold;
+          color: #333;
+          margin: 0;
+      }
+
+      .cart-item-price {
+          color: #e74c3c;
+          font-weight: bold;
+          font-size: 1.1em;
+      }
+
+      .cart-item-quantity {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          margin: 10px 0;
+      }
+
+      .quantity-btn {
+          background: #f8f9fa;
+          border: none;
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.3s ease;
+      }
+
+      .quantity-btn:hover {
+          background: #e9ecef;
+      }
+
+      .remove-item-btn {
+          color: #dc3545;
+          background: none;
+          border: none;
+          padding: 5px 10px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          display: flex;
+          align-items: center;
+          gap: 5px;
+      }
+
+      .remove-item-btn:hover {
+          color: #c82333;
+          transform: scale(1.05);
+      }
+
+      .cart-summary {
+          background: white;
+          padding: 20px;
+          border-radius: 10px;
+          box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+          margin-top: 30px;
+      }
+
+      .checkout-form {
+          margin: 20px 0;
+      }
+
+      .secondary-bg {
+          background: #e74c3c;
+          
+      }
+
+      .secondary-bg:hover {
+          background: #c0392b;
+      }
+
+      #clearCartBtn {
+          background: white;
+          color: #e74c3c;
+          font-weight: bold;
+          transition: all 0.3s ease;
+          border: 2px solid #e74c3c;
+      }
+
+      #clearCartBtn:hover {
+          background: #e74c3c;
+          color: white;
+          transform: translateY(-2px);
+          box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      }
+
+      @keyframes fadeOut {
+          from {
+              opacity: 1;
+              transform: translateY(0);
+          }
+          to {
+              opacity: 0;
+              transform: translateY(-20px);
+          }
+      }
+
+      .cart-item.removing {
+          animation: fadeOut 0.3s ease-out forwards;
+      }
+  </style>
+
+  <script>
+     document.addEventListener('DOMContentLoaded', function() {
+         // Function to get cart from localStorage
          function getCart() {
-            return JSON.parse(localStorage.getItem('cart')) || [];
+             return JSON.parse(localStorage.getItem('cart')) || [];
          }
 
-         // Function to save cart to local storage
+         // Function to save cart to localStorage
          function saveCart(cart) {
-            localStorage.setItem('cart', JSON.stringify(cart));
+             localStorage.setItem('cart', JSON.stringify(cart));
          }
 
          // Function to display cart items and calculate subtotal
          function displayCart() {
-            const cart = getCart();
+             const cart = getCart();
+             const cartItemsContainer = document.getElementById('cartItems');
+             const subtotalElement = document.getElementById('subtotal');
+             const totalAmountInput = document.getElementById('total_amount');
+             let subtotal = 0;
 
-            const cartItemsContainer = document.getElementById('cartItems');
-            const subtotalElement = document.getElementById('subtotal');
-            let subtotal = 0;
+             cartItemsContainer.innerHTML = '';
 
-            cartItemsContainer.innerHTML = '';
-
-            cart.forEach(item => {
-                  // Construct URLs dynamically if needed
-                  var showMealImage = "{{ url('storage/meals') }}/" + item.image;
-
-                  const itemHtml = `
+             if (cart.length === 0) {
+                 cartItemsContainer.innerHTML = `
                      <div class="col-12 text-center">
-                        <div class="single_delicious d-flex align-items-center">
-                              <div class="thumb">
-                                 <img src="${showMealImage}" alt="" style="width: 236px; border-radius: 26%;">
-                              </div>
-                              <div class="info">
-                                 <div class="container">
-                                    <div class="row">
-                                          <div class="col-6"> 
-                                             <h3>${item.name}</h3>
-                                          </div>
-                                          <div class="col-6"> 
-                                             <span>Price: ${item.price} EGP</span>
-                                             <span>Quantity: ${item.quantity}</span>
-                                          </div>
-                                    </div>
-                                 </div>
-                                 <div class="container">
-                                    <div class="row">
-                                          <div class="col-6" style="text-align: left !important;"> 
-                                             <p class='description'>Great way to make your business appear trust and relevant.</p>
-                                          </div>
-                                          <div class="col-6"> 
-                                             <a class="boxed-btn5 remove-from-cart-btn" data-id="${item.id}" style="padding: 16px 20px;">
-                                                <i class="fa fa-minus-square" aria-hidden="true" style="font-size: 22px;"></i>
-                                             </a>
-                                          </div>
-                                    </div>
-                                 </div>
-                              </div>
-                        </div>
+                         <div class="empty-cart">
+                             <i class="fas fa-shopping-cart fa-3x mb-3"></i>
+                             <h3>Your cart is empty</h3>
+                             <p>Add some delicious items to your cart!</p>
+                         </div>
                      </div>
-                  `;
-                  cartItemsContainer.insertAdjacentHTML('beforeend', itemHtml);
-                  subtotal += item.price * item.quantity;
-            });
+                 `;
+                 subtotalElement.textContent = '0.00';
+                 totalAmountInput.value = '0.00';
+                 return;
+             }
 
-            subtotalElement.textContent = subtotal;
+             // Sort cart items by addedAt timestamp
+             cart.sort((a, b) => new Date(b.addedAt) - new Date(a.addedAt));
+
+             cart.forEach(item => {
+                 const itemHtml = `
+                     <div class="col-12">
+                         <div class="cart-item" data-id="${item.id}">
+                             <div class="cart-item-content">
+                                 <div class="row">
+                                     <div class="col-md-2">
+                                         <img src="{{ asset('storage') }}/${item.image}" 
+                                              alt="${item.name}" 
+                                              class="img-fluid rounded"
+                                              style="width: 100%; height: 150px; object-fit: cover;">
+                                     </div>
+                                     <div class="col-md-10">
+                                         <div class="cart-item-header">
+                                             <h3 class="cart-item-title">${item.name}</h3>
+                                             <span class="cart-item-price">${item.price} EGP</span>
+                                         </div>
+                                         <p class="text-muted">${item.description}</p>
+                                         <div class="cart-item-quantity">
+                                             <button class="quantity-btn decrease-quantity" data-id="${item.id}">
+                                                 <i class="fa-solid fa-minus"></i>
+                                             </button>
+                                             <span>${item.quantity}</span>
+                                             <button class="quantity-btn increase-quantity" data-id="${item.id}">
+                                                 <i class="fa-solid fa-plus"></i>
+                                             </button>
+                                         </div>
+                                         <button class="remove-item-btn" data-id="${item.id}">
+                                             <i class="fas fa-trash-alt"></i>
+                                             Remove
+                                         </button>
+                                     </div>
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+                 `;
+                 cartItemsContainer.insertAdjacentHTML('beforeend', itemHtml);
+                 subtotal += item.price * item.quantity;
+             });
+
+             subtotalElement.textContent = subtotal.toFixed(2);
+             totalAmountInput.value = subtotal.toFixed(2);
          }
 
-         // Function to handle cart item removal
-         function handleRemoveFromCart(event) {
-            if (event.target.classList.contains('remove-from-cart-btn')) {
-                  const id = event.target.getAttribute('data-id');
-                  let cart = getCart();
-                  const itemIndex = cart.findIndex(item => item.id === id);
+         // Function to handle quantity changes
+         function handleQuantityChange(event) {
+             const button = event.target.closest('.quantity-btn');
+             if (!button) return;
 
-                  if (itemIndex !== -1) {
+             const id = button.dataset.id.toString(); // Convert to string to ensure consistent type
+             const isIncrease = button.classList.contains('increase-quantity');
+             let cart = getCart();
+             const itemIndex = cart.findIndex(item => item.id === id);
+
+             if (itemIndex !== -1) {
+                 if (isIncrease) {
+                     cart[itemIndex].quantity += 1;
+                 } else {
                      if (cart[itemIndex].quantity > 1) {
-                        // Decrement quantity if more than 1
-                        cart[itemIndex].quantity -= 1;
+                         cart[itemIndex].quantity -= 1;
                      } else {
-                        // Remove item if quantity is 1
-                        cart.splice(itemIndex, 1);
+                         // If quantity would become 0, remove the item
+                         cart.splice(itemIndex, 1);
                      }
-                     saveCart(cart);
-                     displayCart();
-                  }
-            }
+                 }
+                 saveCart(cart);
+                 displayCart();
+             }
          }
 
-         // Attach event listener to the document
-         document.addEventListener('click', handleRemoveFromCart);
+         // Function to handle item removal
+         function handleRemoveItem(event) {
+             const button = event.target.closest('.remove-item-btn');
+             if (!button) return;
 
-         // Initial display of cart items
-         displayCart();
+             const id = button.dataset.id.toString(); // Convert to string to ensure consistent type
+             let cart = getCart();
+             const itemIndex = cart.findIndex(item => item.id === id);
+
+             if (itemIndex !== -1) {
+                 // Remove the item from the cart array
+                 cart.splice(itemIndex, 1);
+                 // Save the updated cart to localStorage
+                 saveCart(cart);
+                 // Update the display
+                 displayCart();
+             }
+         }
+
+         // Attach event listeners
+         document.addEventListener('click', handleQuantityChange);
+         document.addEventListener('click', handleRemoveItem);
 
          // Clear cart
          document.getElementById('clearCartBtn').addEventListener('click', function() {
-            localStorage.removeItem('cart');
-            displayCart(); // Update cart display after clearing
+             if (confirm('Are you sure you want to clear your cart?')) {
+                 localStorage.removeItem('cart');
+                 displayCart();
+             }
          });
-      });
+
+         // Initial display of cart items
+         displayCart();
+     });
 
   </script>
    <!--================ Blog Area end =================-->

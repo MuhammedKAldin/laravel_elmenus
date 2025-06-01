@@ -76,6 +76,10 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Create stores with their categories and products
-        Store::factory(10)->create();
+        $this->call([
+            StoreSeeder::class,
+            ProductCategorySeeder::class,
+            ProductSeeder::class,
+        ]);
     }
 }

@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('stores', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('domain')->unique();
+            $table->string('slug')->unique();
             $table->string('status')->default('active');
             $table->string('description')->nullable();
             $table->string('address')->nullable();
@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('email')->nullable();
             $table->string('logo')->nullable();
             $table->string('cover_image')->nullable();
+            $table->string('category')->default('Grills');
             $table->string('type')->default('restaurant');
             $table->boolean('is_active')->default(true);
             $table->timestamps();

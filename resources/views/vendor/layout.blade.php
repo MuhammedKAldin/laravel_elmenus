@@ -19,7 +19,8 @@
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/owl.carousel.min.css">
     <link rel="stylesheet" href="css/magnific-popup.css">
-    <link rel="stylesheet" href="css/font-awesome.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="css/themify-icons.css">
     <link rel="stylesheet" href="css/nice-select.css">
     <link rel="stylesheet" href="css/flaticon.css">
@@ -82,7 +83,10 @@
                                                 <a href="#">{{ Auth::user()->name }} <i class="ti-angle-down"></i></a>
                                                 <ul class="submenu">
                                                     {{-- If Vendor Owner --}}
-                                                    <li><a class="dropdown-item" href="{{ route('vendorProfile') }}"> Vendor </a></li>
+                                                    @if (Auth::user()->store)
+                                                        <li><a href="{{ route('vendor.profile') }}">My Store</a></li>
+                                                        <li><a href="{{ route('vendor.meals') }}">Manage Meals</a></li>
+                                                    @endif
 
                                                     <li><a class="dropdown-item" href="{{ route('logout') }}"
                                                         onclick="event.preventDefault();
@@ -172,7 +176,7 @@
                             <div class="row justify-content-center">
                                 <div class="col-lg-8">
                                     <div class="single_testmonial text-center">
-                                        <p>“Donec imperdiet congue orci consequat mattis. Donec rutrum porttitor
+                                        <p>"Donec imperdiet congue orci consequat mattis. Donec rutrum porttitor
                                             sollicitudin. Pellentesque id dolor tempor sapien feugiat ultrices nec
                                             sed
                                             neque.</p>
@@ -197,7 +201,7 @@
                             <div class="row justify-content-center">
                                 <div class="col-lg-8">
                                     <div class="single_testmonial text-center">
-                                        <p>“Donec imperdiet congue orci consequat mattis. Donec rutrum porttitor
+                                        <p>"Donec imperdiet congue orci consequat mattis. Donec rutrum porttitor
                                             sollicitudin. Pellentesque id dolor tempor sapien feugiat ultrices nec
                                             sed
                                             neque.</p>
@@ -222,7 +226,7 @@
                             <div class="row justify-content-center">
                                 <div class="col-lg-8">
                                     <div class="single_testmonial text-center">
-                                        <p>“Donec imperdiet congue orci consequat mattis. Donec rutrum porttitor
+                                        <p>"Donec imperdiet congue orci consequat mattis. Donec rutrum porttitor
                                             sollicitudin. Pellentesque id dolor tempor sapien feugiat ultrices nec
                                             sed
                                             neque.</p>

@@ -26,27 +26,17 @@ class PaymobService
 
     public function createOrder($tokens)
     {
-        $total = 100;
-        $items = [
-            [ "name"=> "ASC1515",
-                "amount_cents"=> "500000",
-                "description"=> "Smart Watch",
-                "quantity"=> "1"
-            ],
-            [
-                "name"=> "ERT6565",
-                "amount_cents"=> "200000",
-                "description"=> "Power Bank",
-                "quantity"=> "1"
-            ]
-        ];
+        $request = request();
+        $total = $request->input('total_amount', 0);
+        
         $data = [
-            "auth_token" =>   $tokens,
-            "delivery_needed" =>"false",
-            "amount_cents"=> $total*100,
-            "currency"=> "EGP",
-            "items"=> $items,
+            "auth_token" => $tokens,
+            "delivery_needed" => "false",
+            "amount_cents" => round($total * 100), // Convert to cents and round to avoid floating point issues
+            "currency" => "EGP",
+            "items" => []
         ];
+        
         $response = Http::post('https://accept.paymob.com/api/ecommerce/orders', $data);
         return $response->object();
     }
@@ -57,70 +47,78 @@ class PaymobService
             'paymob_mobile_wallet_payment',
             env('PAYMOB_MOBILE_WALLET_INTEGRATION_ID'),
             '00100',
-            "01095304064"
+            $request->input('phone_number', '')
         );
     }
 
     public function checkingOut($payment_method, $integration_id, $order_id, $iframe_id_or_wallet_number)
     {
+        $request = request();
+        $total = $request->input('total_amount', 0);
+
         $response = Http::withHeaders([
             'content-type' => 'application/json'
         ])->post('https://accept.paymobsolutions.com/api/auth/tokens',[
             "api_key"=> env('PAYMOB_API_KEY')
         ]);
-        $json=$response->json();
-        $response_final=Http::withHeaders([
+        $json = $response->json();
+        
+        $response_final = Http::withHeaders([
             'content-type' => 'application/json'
         ])->post('https://accept.paymobsolutions.com/api/ecommerce/orders',[
-            "auth_token"=>$json['token'],
-            "delivery_needed"=>"false",
-            "amount_cents"=>100,
+            "auth_token" => $json['token'],
+            "delivery_needed" => "false",
+            "amount_cents" => round($total * 100), // Convert to cents and round
             "merchant_order_id" => 15
         ]);
-        $json_final=$response_final->json();
+        $json_final = $response_final->json();
+        
         $user = Auth::user();
         $name = $user->name;
         if ((count(explode(" ",$name)) == 1)) {
-            $first_name = $name;$last_name=$name;
+            $first_name = $name;
+            $last_name = $name;
         } else {
             $first_name = explode(" ",$name)[0];
             $last_name = explode(" ",$name)[1];
         }
-        $response_final_final=Http::withHeaders([
+        
+        $response_final_final = Http::withHeaders([
             'content-type' => 'application/json'
         ])->post('https://accept.paymobsolutions.com/api/acceptance/payment_keys',[
-            "auth_token"=>$json['token'],
-            "expiration"=> 36000,
-            "amount_cents"=> 1000,
-            "order_id"=>$order_id,
-            "billing_data"=>[
-                "first_name" => "MTest",
-                "last_name" => "KTest",
-                "phone_number" => "NA",
-                "email" => "test@example.com",
+            "auth_token" => $json['token'],
+            "expiration" => 36000,
+            "amount_cents" => round($total * 100), // Convert to cents and round
+            "order_id" => $order_id,
+            "billing_data" => [
+                "first_name" => $first_name,
+                "last_name" => $last_name,
+                "phone_number" => $user->phone ?? "NA",
+                "email" => $user->email,
                 "apartment" => "NA",
                 "floor" => "NA",
-                "street" => "New Maadi",
+                "street" => $user->address ?? "NA",
                 "building" => "NA",
                 "shipping_method" => "NA",
-                "postal_code" => "75275",
-                "city" => "Cairo",
-                "state" => "Maadi",
-                "country" => "Egypt"
+                "postal_code" => $user->postal_code ?? "NA",
+                "city" => $user->city ?? "NA",
+                "state" => $user->state ?? "NA",
+                "country" => $user->country ?? "Egypt"
             ],
-            "currency"=>"EGP",
-            "integration_id"=>$integration_id
+            "currency" => "EGP",
+            "integration_id" => $integration_id
         ]);
-        $response_final_final_json=$response_final_final->json();
+        $response_final_final_json = $response_final_final->json();
+        
         if ($payment_method == 'paymob_mobile_wallet_payment') {
-            $response_iframe =Http::withHeaders([
+            $response_iframe = Http::withHeaders([
                 'content-type' => 'application/json'
             ])->post('https://accept.paymob.com/api/acceptance/payments/pay',[
-                "source"=>[
-                    "identifier"=> $iframe_id_or_wallet_number,
-                    "subtype"=> "WALLET"
+                "source" => [
+                    "identifier" => $iframe_id_or_wallet_number,
+                    "subtype" => "WALLET"
                 ],
-                "payment_token"=>$response_final_final_json['token'],
+                "payment_token" => $response_final_final_json['token'],
             ]);
             return $response_iframe->json()['redirect_url'];
         } else {
@@ -130,6 +128,9 @@ class PaymobService
 
     public function getPaymentToken($order, $token)
     {
+        $request = request();
+        $total = $request->input('total_amount', 0);
+        
         $billingData = [
             "apartment" => '45',
             "email" => "newmail@gmai.com",
@@ -145,15 +146,17 @@ class PaymobService
             "last_name" => "fared",
             "state" => "NA"
         ];
+        
         $data = [
             "auth_token" => $token,
-            "amount_cents" => 100*100,
+            "amount_cents" => round($total * 100), // Convert to cents and round
             "expiration" => 3600,
             "order_id" => $order->id,
             "billing_data" => $billingData,
             "currency" => "EGP",
             "integration_id" => env('PAYMOB_INTEGRATION_ID')
         ];
+        
         $response = Http::post('https://accept.paymob.com/api/acceptance/payment_keys', $data);
         return $response->object()->token;
     }

@@ -19,7 +19,10 @@
     <link rel="stylesheet" href="{{ asset('css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('css/owl.carousel.min.css') }}">
     <link rel="stylesheet" href="{{ asset('css/magnific-popup.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/font-awesome.min.css') }}">
+    <!-- Remove old FontAwesome -->
+    <!-- <link rel="stylesheet" href="{{ asset('css/font-awesome.min.css') }}"> -->
+    <!-- Add new FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="{{ asset('css/themify-icons.css') }}">
     <link rel="stylesheet" href="{{ asset('css/nice-select.css') }}">
     <link rel="stylesheet" href="{{ asset('css/flaticon.css') }}">
@@ -83,7 +86,10 @@
                                                 <a href="#">{{ Auth::user()->name }} <i class="ti-angle-down"></i></a>
                                                 <ul class="submenu">
                                                     {{-- If Vendor Owner --}}
-                                                    <li><a class="dropdown-item" href="{{ route('vendorProfile') }}"> Vendor </a></li>
+                                                    @if (Auth::user()->store)
+                                                        <li><a href="{{ route('vendor.profile') }}">My Store</a></li>
+                                                        <li><a href="{{ route('vendor.meals') }}">Manage Meals</a></li>
+                                                    @endif
 
                                                     <li><a class="dropdown-item" href="{{ route('logout') }}"
                                                         onclick="event.preventDefault();
@@ -117,22 +123,22 @@
                                     <ul>
                                         <li>
                                             <a href="#">
-                                                <i class="fa fa-instagram"></i>
+                                                <i class="fa-brands fa-instagram"></i>
                                             </a>
                                         </li>
                                         <li>
                                             <a href="#">
-                                                <i class="fa fa-twitter"></i>
+                                                <i class="fa-brands fa-twitter"></i>
                                             </a>
                                         </li>
                                         <li>
                                             <a href="#">
-                                                <i class="fa fa-facebook"></i>
+                                                <i class="fa-brands fa-facebook"></i>
                                             </a>
                                         </li>
                                         <li>
                                             <a href="#">
-                                                <i class="fa fa-google-plus"></i>
+                                                <i class="fa-brands fa-google-plus"></i>
                                             </a>
                                         </li>
                                       
@@ -173,7 +179,7 @@
                             <div class="row justify-content-center">
                                 <div class="col-lg-8">
                                     <div class="single_testmonial text-center">
-                                        <p>“Donec imperdiet congue orci consequat mattis. Donec rutrum porttitor
+                                        <p>"Donec imperdiet congue orci consequat mattis. Donec rutrum porttitor
                                             sollicitudin. Pellentesque id dolor tempor sapien feugiat ultrices nec
                                             sed
                                             neque.</p>
@@ -183,11 +189,11 @@
                                             </div>
                                             <h4>Kristiana Chouhan</h4>
                                             <div class="stars">
-                                                <i class="fa fa-star"></i>
-                                                <i class="fa fa-star"></i>
-                                                <i class="fa fa-star"></i>
-                                                <i class="fa fa-star"></i>
-                                                <i class="fa fa-star-half"></i>
+                                                <i class="fa-solid fa-star"></i>
+                                                <i class="fa-solid fa-star"></i>
+                                                <i class="fa-solid fa-star"></i>
+                                                <i class="fa-solid fa-star"></i>
+                                                <i class="fa-solid fa-star-half-stroke"></i>
                                             </div>
                                         </div>
                                     </div>
@@ -198,7 +204,7 @@
                             <div class="row justify-content-center">
                                 <div class="col-lg-8">
                                     <div class="single_testmonial text-center">
-                                        <p>“Donec imperdiet congue orci consequat mattis. Donec rutrum porttitor
+                                        <p>"Donec imperdiet congue orci consequat mattis. Donec rutrum porttitor
                                             sollicitudin. Pellentesque id dolor tempor sapien feugiat ultrices nec
                                             sed
                                             neque.</p>
@@ -208,11 +214,11 @@
                                             </div>
                                             <h4>Arafath Hossain</h4>
                                             <div class="stars">
-                                                <i class="fa fa-star"></i>
-                                                <i class="fa fa-star"></i>
-                                                <i class="fa fa-star"></i>
-                                                <i class="fa fa-star"></i>
-                                                <i class="fa fa-star-half"></i>
+                                                <i class="fa-solid fa-star"></i>
+                                                <i class="fa-solid fa-star"></i>
+                                                <i class="fa-solid fa-star"></i>
+                                                <i class="fa-solid fa-star"></i>
+                                                <i class="fa-solid fa-star-half-stroke"></i>
                                             </div>
                                         </div>
                                     </div>
@@ -223,7 +229,7 @@
                             <div class="row justify-content-center">
                                 <div class="col-lg-8">
                                     <div class="single_testmonial text-center">
-                                        <p>“Donec imperdiet congue orci consequat mattis. Donec rutrum porttitor
+                                        <p>"Donec imperdiet congue orci consequat mattis. Donec rutrum porttitor
                                             sollicitudin. Pellentesque id dolor tempor sapien feugiat ultrices nec
                                             sed
                                             neque.</p>
@@ -233,11 +239,11 @@
                                             </div>
                                             <h4>A.H Shemanto</h4>
                                             <div class="stars">
-                                                <i class="fa fa-star"></i>
-                                                <i class="fa fa-star"></i>
-                                                <i class="fa fa-star"></i>
-                                                <i class="fa fa-star"></i>
-                                                <i class="fa fa-star-half"></i>
+                                                <i class="fa-solid fa-star"></i>
+                                                <i class="fa-solid fa-star"></i>
+                                                <i class="fa-solid fa-star"></i>
+                                                <i class="fa-solid fa-star"></i>
+                                                <i class="fa-solid fa-star-half-stroke"></i>
                                             </div>
                                         </div>
                                     </div>
@@ -298,22 +304,22 @@
                             <ul>
                                 <li>
                                     <a href="#">
-                                        <i class="ti-instagram"></i>
+                                        <i class="fa-brands fa-instagram"></i>
                                     </a>
                                 </li>
                                 <li>
                                     <a href="#">
-                                        <i class="ti-twitter-alt"></i>
+                                        <i class="fa-brands fa-twitter"></i>
                                     </a>
                                 </li>
                                 <li>
                                     <a href="#">
-                                        <i class="ti-facebook"></i>
+                                        <i class="fa-brands fa-facebook"></i>
                                     </a>
                                 </li>
                                 <li>
                                     <a href="#">
-                                        <i class="fa fa-google-plus"></i>
+                                        <i class="fa-brands fa-google-plus"></i>
                                     </a>
                                 </li>
                             </ul>
@@ -329,7 +335,7 @@
                 <div class="col-xl-12">
                     <p class="copy_right text-center">
                         <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="fa fa-heart-o" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
+Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="fa-regular fa-heart"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
 <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
                     </p>
                 </div>

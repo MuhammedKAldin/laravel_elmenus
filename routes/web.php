@@ -7,6 +7,8 @@ use App\Http\Controllers\PaymobController;
 use App\Http\Controllers\PortalController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\MobileWalletController;
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\ProductController;
 
 /*
 |--------------------------------------------------------------------------
@@ -75,3 +77,8 @@ Route::post('/credit', [PaymobController::class, 'credit'])->name('checkout');
 
 // Paymob Response
 Route::get('/callback', [PaymobController::class, 'callback'])->name('callback'); 
+
+Route::middleware(['auth', 'setActiveStore'])->prefix('admin')->name('admin.')->group(function () {
+    Route::resource('categories', CategoryController::class);
+    Route::resource('products', ProductController::class);
+}); 

@@ -4,9 +4,11 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Models\User;
-use App\Models\Vendor;
-use App\Models\MenuItem;
+use App\Models\Store;
+use App\Models\Category;
+use App\Models\Product;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -22,62 +24,58 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'test@example.com',
         // ]);
 
-        User::factory()->create([
-            'name' => 'Mohamed Kamal Aldin',
-            'email' => 'test@example.com',
-            'password' => 'test12345678',
-        ]);
+        // Create super admin user
+        User::firstOrCreate(
+            ['email' => 'superadmin@example.com'],
+            [
+                'name' => 'Super Admin',
+                'password' => Hash::make('password'),
+                'role' => User::ROLE_SUPER_ADMIN,
+            ]
+        );
+
+        // Create test users
+        User::firstOrCreate(
+            ['email' => 'mohamed@example.com'],
+            [
+                'name' => 'Mohamed Kamal Aldin',
+                'password' => Hash::make('test12345678'),
+                'role' => User::ROLE_USER,
+            ]
+        );
         
+        User::firstOrCreate(
+            ['email' => 'hazem@example.com'],
+            [
+                'name' => 'Hazem Ahmed',
+                'password' => Hash::make('test12345678'),
+                'role' => User::ROLE_USER,
+            ]
+        );
+
+        User::firstOrCreate(
+            ['email' => 'osama@example.com'],
+            [
+                'name' => 'Osama Mohamed',
+                'password' => Hash::make('test12345678'),
+                'role' => User::ROLE_USER,
+            ]
+        );
+
+        // Create admin user
         User::factory()->create([
-            'name' => 'Hazem Ahmed',
-            'email' => 'test2@gmail.com',
-            'password' => 'test12345678',
+            'name' => 'Admin User',
+            'email' => 'admin@example.com',
+            'password' => bcrypt('password'),
+            'role' => User::ROLE_ADMIN,
         ]);
 
-        User::factory()->create([
-            'name' => 'Osama Mohamed',
-            'email' => 'test3@gmail.com',
-            'password' => 'test12345678',
+        // Create regular users
+        User::factory(5)->create([
+            'role' => User::ROLE_USER,
         ]);
 
-        Vendor::factory()->create([
-            'verified_user_id' => '1',
-            'name' => 'McDonalds',
-            'email' => 'mcdonald@gmail.com',
-            'image' => 'mcdonald_place.png',
-            'location' => 'Nasr St, Maadi, Cairo',
-            'hotline' => '19019',
-            'description' => 'Fresh Meals',
-        ]);
-
-        Vendor::factory()->create([
-            'verified_user_id' => '2',
-            'name' => 'الحاتي',
-            'email' => 'Alhatti@gmail.com',
-            'image' => 'hatti_place.png',
-            'location' => '5th Settlement, Cairo',
-            'hotline' => '16079',
-            'description' => 'Tasty Kebab and Kofta Food',
-        ]);
-
-        MenuItem::factory()->create([
-            'vendor_id' => "1",
-            'meal_name' => "Lemon Pepper Chicken Wings with Hot Honey Glaze",
-            'meal_desc' => "Tasty Meal",
-            'meal_image' => "menuItem1.jpg",
-            'meal_price' => "99",
-            'meal_category' => "fried chicken",
-            'meal_availability' => "true",
-        ]);
-
-        MenuItem::factory()->create([
-            'vendor_id' => "1",
-            'meal_name' => "Cheese Chicken Burger",
-            'meal_desc' => "Tasty Meal",
-            'meal_image' => "menuItem1.jpg",
-            'meal_price' => "99",
-            'meal_category' => "fried chicken",
-            'meal_availability' => "true",
-        ]);
+        // Create stores with their categories and products
+        Store::factory(10)->create();
     }
 }

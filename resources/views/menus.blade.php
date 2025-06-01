@@ -75,20 +75,20 @@
                     </br>
                     
                     <div id="searchResults">
-                        @foreach ($vendors as $vendor)
+                        @foreach ($stores as $store)
                         <div class="single-post">
                            <!-- features_room_startt -->
                            <div class="Burger_President_area">
                               <div class="Burger_President_here">
                                  <div class="single_Burger_President" style="width:100%!important;">
                                        <div class="room_thumb">
-                                          <img src="{{asset('storage/vendors/'.$vendor->image)}}" alt="">
+                                          <img src="{{ asset('storage/stores/'.$store->cover_image) }}" alt="">
                                           <div class="room_heading d-flex justify-content-between align-items-center">
                                              <div class="room_heading_inner">
-                                                   <span> {{$vendor->name}} </span>
-                                                   <h3> {{$vendor->location}} </h3>
-                                                   <p> {{$vendor->description}} </p>
-                                                   <a href="{{route('openMenu', ["id" => $vendor->verified_user_id])}}" class="boxed-btn3">Open Menu</a>
+                                                   <span> {{$store->name}} </span>
+                                                   <h3> {{$store->address}} </h3>
+                                                   <p> {{$store->description}} </p>
+                                                   <a href="{{ route('openMenu', $store->id) }}" class="boxed-btn3">Open Menu</a>
                                              </div>
                                              
                                           </div>
@@ -127,10 +127,10 @@
 
                   if(response.length > 0) 
                   {
-                     response.forEach(function(item) 
+                     response.forEach(function(store) 
                      {
                         // Construct URLs dynamically if needed
-                        var showMenuUrl = "{{ url('/menus') }}/" + item.id; 
+                        var showMenuUrl = "{{ url('/menus') }}/" + store.id; 
 
                         // Build HTML using the properties from the response
                         var resultHtml = `
@@ -139,12 +139,12 @@
                                     <div class="Burger_President_here">
                                        <div class="single_Burger_President" style="width:100%!important;">
                                           <div class="room_thumb">
-                                                <img src="{{ asset('storage/vendors/') }}/${item.image}" alt="">
+                                                <img src="{{ asset('storage/stores/') }}/${store.cover_image}" alt="">
                                                 <div class="room_heading d-flex justify-content-between align-items-center">
                                                    <div class="room_heading_inner">
-                                                      <span>${item.name}</span>
-                                                      <h3>${item.location}</h3>
-                                                      <p>${item.description}</p>
+                                                      <span>${store.name}</span>
+                                                      <h3>${store.address}</h3>
+                                                      <p>${store.description}</p>
                                                       <a href="${showMenuUrl}" class="boxed-btn3">Open Menu</a>
                                                    </div>
                                                 </div>

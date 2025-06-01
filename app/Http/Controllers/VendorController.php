@@ -7,22 +7,26 @@ use App\Models\Vendor;
 use App\Models\MenuItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Services\VendorService;
 
 class VendorController extends Controller
 {
+    protected $vendorService;
+
+    public function __construct(VendorService $vendorService)
+    {
+        $this->vendorService = $vendorService;
+    }
+
     public function vendorProfile()
     {
-        $id = Auth::user()->id;
-    
-        $user = Vendor::where('verified_user_id', $id)->first();
-    
+        $user = $this->vendorService->getVendorProfile();
         return view('vendor.profile', compact('user'));
     }
     
     public function vendorMeals()
     {
-        $id = Auth::user()->id;
-        $items = MenuItem::where('vendor_id', $id)->get();
+        $items = $this->vendorService->getVendorMeals();
         return view('vendor.meals', compact('items'));
     }
 
@@ -33,29 +37,7 @@ class VendorController extends Controller
 
     public function vendorCreateProcess(Request $request)
     {
-        $request->validate([
-            'meal_name' => 'required',
-            'meal_price' => 'required',
-            'meal_category' => 'required|in:grill,fried chicken,pizza,burger',
-            'meal_desc' => 'required',
-            'meal_image' => 'required|image', 
-        ]);
-
-        $data = $request->all();
-        $data['vendor_id'] = Auth::user()->id;
-        $data['meal_availability'] = "available";
-
-        // Upload Image if it exists
-        if ($request->hasFile('meal_image')) 
-        {
-            $image = $request->file('meal_image'); // Retrieve the uploaded file
-            $destinationPath = 'storage/meals/';
-            $imageName = date('YmdHis').".".$image->getClientOriginalExtension(); // Generate a unique name
-            $image->move($destinationPath, $imageName); // Move the image to the storage directory
-            $data['meal_image'] = $imageName; // Save the image name in the data array
-        } 
-
-        MenuItem::create($data);
+        $this->vendorService->createMeal($request);
         return redirect()->route('vendorCreate')->with('success','Meal added successfully');
     }
 
@@ -71,37 +53,26 @@ class VendorController extends Controller
 
     public function vendorShowMeal($id)
     {
-        $item = MenuItem::where('id', $id)->first();
+        $item = $this->vendorService->getMealById($id);
         return view('vendor.show-meal', compact('item'));
     }
 
     public function editMealProcess(Request $request, $id)
     {
-        $input = $request->all();
-        $item = Menuitem::findOrFail($id);
-
-        $item->update($input);
-
+        $this->vendorService->editMeal($request, $id);
         return redirect()->route('vendorShowMeal', ['id' => $id])
                ->with('success', 'Meal updated successfully!');
     }
 
     public function removeMeal($id)
     {
-        $item = Menuitem::findOrFail($id);
-        $item->delete();
-
+        $this->vendorService->removeMeal($id);
         return redirect()->route('vendorMeals');
     }
 
     public function vendorSearchMeals(Request $request)
     {
-        $searchTerm = $request->input('query');
-    
-        // Search the MenuItem model based on the search term
-        $results = Menuitem::where('meal_name', 'LIKE', '%' . $searchTerm . '%')->get();
-    
-        // Return the search results as JSON for AJAX
+        $results = $this->vendorService->searchMeals($request);
         return response()->json($results);
     }
 }

@@ -1,7 +1,6 @@
 # Elmenus - Multivendor Restaurant SaaS Platform
 
-A comprehensive Laravel-based SaaS platform that enables restaurants to manage their online presence, menus, and orders while providing customers with a seamless discovery and ordering experience, uses Single Database Multivendor architure.
-
+A comprehensive Laravel-based SaaS platform that enables restaurants to manage their online presence, menus, and orders while providing customers with a seamless discovery and ordering experience, uses Single Database Multivendor architecture.
 ## 🚀 Quick Start
 
 1. Clone the repository
